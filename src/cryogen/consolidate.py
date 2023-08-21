@@ -1,5 +1,5 @@
-from cryogen.constants import PARTITION_SIZES, MAX_UINT256
-from cryogen.cryo import extract_range
+from cryogen.constants import PARTITION_SIZES, FAR_AWAY_BLOCK
+from cryogen.utils import extract_range
 from pathlib import Path
 
 
@@ -57,7 +57,7 @@ def find_gaps(ranges: list[range]) -> list[range]:
     gaps = []
 
     if len(ranges) == 0:
-        return [range(0, MAX_UINT256)]
+        return [range(0, FAR_AWAY_BLOCK)]
 
     if ranges[0].start > 0:
         gaps.append(range(0, ranges[0].start))
@@ -66,6 +66,6 @@ def find_gaps(ranges: list[range]) -> list[range]:
         if a.stop != b.start:
             gaps.append(range(a.stop, b.start))
 
-    gaps.append(range(ranges[-1].stop, MAX_UINT256))
+    gaps.append(range(ranges[-1].stop, FAR_AWAY_BLOCK))
 
     return gaps
