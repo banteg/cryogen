@@ -1,0 +1,22 @@
+[tool.poetry]
+authors = ["banteg"]
+description = "helps you preserve an ethereum dataset"
+license = "MIT"
+name = "cryogen"
+packages = [{include = 'cryogen', from = 'src'}]
+readme = "readme.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.4.0"
+ruff = ">=0.0.285"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
