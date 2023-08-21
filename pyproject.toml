@@ -20,3 +20,9 @@ requires = ["poetry-core"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.black]
+line-length = 100
