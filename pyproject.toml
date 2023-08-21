@@ -11,6 +11,7 @@ version = "0.1.0"
 pyarrow = ">=12.0.1"
 python = ">=3.10"
 typer = ">=0.9.0"
+rich = "^13.5.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.4.0"
@@ -28,3 +29,6 @@ line-length = 100
 
 [tool.black]
 line-length = 100
+
+[tool.poetry.scripts]
+cryogen = "cryogen.cli:app"
