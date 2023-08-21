@@ -1,4 +1,5 @@
 from cryogen import consolidate
+from cryogen.constants import MAX_UINT256
 
 
 def test_consolidate():
@@ -13,4 +14,14 @@ def test_consolidate():
         range(2_210_000, 2_220_000),
         range(2_220_000, 2_221_000),
         range(2_221_000, 2_222_000),
+    ]
+
+
+def test_find_gaps():
+    ranges = [range(1_000_000, 2_000_000), range(17_100_000, 17_200_000)]
+    gaps = consolidate.find_gaps(ranges)
+    assert gaps == [
+        range(0, 1_000_000),
+        range(2_000_000, 17_100_000),
+        range(17_200_000, MAX_UINT256),
     ]
