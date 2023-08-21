@@ -1,6 +1,6 @@
 import pytest
 from cryogen import utils
-from cryogen.constants import FAR_AWAY_BLOCK
+from cryogen.constants import FAR_AWAY_BLOCK, BLOCK_CHUNK
 
 name = "ethereum__contracts__12325000_to_12325999.parquet"
 
@@ -30,7 +30,7 @@ def test_parse_blocks(blocks, expected):
 
 @pytest.mark.parametrize(
     "blocks",
-    ["/", "1000:2000:3000", "-1000:"],
+    ["/", "1000:2000:3000", "-1000:", "4000:3000", "1234:4567"],
 )
 def test_parse_blocks_err(blocks):
     with pytest.raises(ValueError):
