@@ -1,4 +1,10 @@
-from cryogen.constants import PARTITION_SIZES
+from cryogen.constants import PARTITION_SIZES, MAX_UINT256
+from cryogen.cryo import extract_range
+from pathlib import Path
+
+
+def sort_ranges(ranges):
+    return sorted(ranges, key=lambda r: r.start)
 
 
 def combine_ranges(
@@ -9,7 +15,7 @@ def combine_ranges(
 
     returns {big_range: [ranges, to, be, merged]}
     """
-    ranges = sorted(ranges, key=lambda r: r.start)
+    ranges = sort_ranges(ranges)
     consumed_ranges = set()
     combined_ranges = {}
 
@@ -41,3 +47,25 @@ def combine_ranges(
             combined_ranges[r] = [r]
 
     return combined_ranges
+
+
+def find_gaps(ranges: list[range]) -> list[range]:
+    """
+    find uncovered gaps from in list of ranges.
+    """
+    ranges = sort_ranges(ranges)
+    gaps = []
+
+    if len(ranges) == 0:
+        return [range(0, MAX_UINT256)]
+
+    if ranges[0].start > 0:
+        gaps.append(range(0, ranges[0].start))
+
+    for a, b in zip(ranges, ranges[1:]):
+        if a.stop != b.start:
+            gaps.append(range(a.stop, b.start))
+
+    gaps.append(range(ranges[-1].stop, MAX_UINT256))
+
+    return gaps
