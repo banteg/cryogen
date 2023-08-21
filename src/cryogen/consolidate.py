@@ -9,6 +9,7 @@ def combine_ranges(
 
     returns {big_range: [ranges, to, be, merged]}
     """
+    ranges = sorted(ranges, key=lambda r: r.start)
     consumed_ranges = set()
     combined_ranges = {}
 
