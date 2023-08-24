@@ -35,10 +35,8 @@ class Dataset(Enum):
 def collect(
     dataset: Dataset,
     data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
-    rpc_url: Annotated[str, Option(envvar="ETH_RPC_URL")],
     blocks: Annotated[range, Option(parser=parse_blocks)] = DEFAULT_RANGE,
 ):
-    print(dataset.value, data_dir, rpc_url)
     dataset_dir = data_dir / dataset.value
 
     console.log(blocks)
