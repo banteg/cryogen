@@ -1,5 +1,4 @@
 import time
-from enum import Enum
 from pathlib import Path
 from typing import Annotated
 
@@ -8,25 +7,11 @@ import rich
 from typer import Option, Typer
 
 from cryogen.consolidate import combine_ranges, find_gaps
-from cryogen.constants import DEFAULT_RANGE, FAR_AWAY_BLOCK
+from cryogen.constants import DEFAULT_RANGE, FAR_AWAY_BLOCK, Dataset
 from cryogen.parquet import merge_parquets, parquet_info
 from cryogen.utils import extract_range, parse_blocks, replace_range
 
 app = Typer()
-
-
-class Dataset(Enum):
-    blocks = "blocks"
-    transactions = "transactions"
-    logs = "logs"
-    contracts = "contracts"
-    traces = "traces"
-    state_diffs = "state_diffs"
-    balance_diffs = "balance_diffs"
-    code_diffs = "code_diffs"
-    nonce_diffs = "nonce_diffs"
-    storage_diffs = "storage_diffs"
-    vm_traces = "vm_traces"
 
 
 @app.command()
