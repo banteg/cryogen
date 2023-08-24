@@ -1,16 +1,11 @@
 from collections import Counter
 from pathlib import Path
 from time import time
-from rich.progress import track
 
+import polars as pl
 from pyarrow.dataset import dataset as arrow_dataset
 from pyarrow.parquet import FileMetaData, ParquetDataset, ParquetFile, ParquetWriter
-from enum import Enum
-
-
-class MergeMethod(Enum):
-    batches = "batches"
-    tables = "tables"
+from rich.progress import track
 
 
 def parquet_info(files: str | list[str]) -> dict:
@@ -33,27 +28,10 @@ def parquet_info(files: str | list[str]) -> dict:
     return dict(info)
 
 
-def merge_parquets(files: list[str], output: str, method: MergeMethod):
+def merge_parquets(files: list[str], output: str):
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
-    with ParquetWriter(
-        output,
-        dataset.schema,
-        compression="zstd",
-        compression_level=3,
-    ) as writer:
-        match method:
-            case MergeMethod.batches:
-                # there can be more batches if merge files containing over 2**20 rows
-                for batch in track(
-                    dataset.to_batches(),
-                    total=len(dataset.files),
-                    description=Path(output).stem,  # noqa: F821
-                ):
-                    writer.write_batch(batch)
-            case MergeMethod.tables:
-                start = time()
-                print(Path(output).stem, end="", flush=True)
-                writer.write_table(dataset.to_table())
-                print(f"... took {time() - start:.3f}")
-            case _:
-                raise NotImplementedError("unsupported merge method")
+    with ParquetWriter(output, dataset.schema, compression="zstd", compression_level=3) as writer:
+        # there can be more batches if merge files containing over 2**20 rows
+        bar = track(dataset.to_batches(), total=len(dataset.files), description=Path(output).stem)
+        for batch in bar:
+            writer.write_batch(batch)

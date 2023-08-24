@@ -1,14 +1,15 @@
+from enum import Enum
+from pathlib import Path
 from time import time
 from typing import Annotated, Optional
-from typer import Typer, Argument, Option, prompt
-from pathlib import Path
-from click import Choice
-from enum import Enum
-from cryogen.consolidate import find_gaps, combine_ranges
-from cryogen.utils import extract_range, parse_blocks, replace_range
-from cryogen.parquet import merge_parquets, parquet_info, MergeMethod
-from cryogen.constants import FAR_AWAY_BLOCK
+
 from rich import print
+from typer import Argument, Option, Typer, prompt
+
+from cryogen.consolidate import combine_ranges, find_gaps
+from cryogen.constants import FAR_AWAY_BLOCK
+from cryogen.parquet import merge_parquets, parquet_info
+from cryogen.utils import extract_range, parse_blocks, replace_range
 
 app = Typer()
 
@@ -51,7 +52,6 @@ def consolidate(
     dataset: Dataset,
     data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
     suffix: str = "out",
-    method: MergeMethod = MergeMethod.batches,
 ):
     print(dataset.value, data_dir)
     dataset_dir = data_dir / dataset.value
@@ -72,7 +72,7 @@ def consolidate(
         output_file = output_dir / replace_range(sample_name, r).name
         input_files = [replace_range(sample_name, sub) for sub in combined[r]]
         # print(output_file)
-        merge_parquets(input_files, output_file, method)
+        merge_parquets(input_files, output_file)
 
     info_out = parquet_info(output_dir)
     print(info_out)
