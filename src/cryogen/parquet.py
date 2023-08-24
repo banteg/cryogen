@@ -31,7 +31,7 @@ def parquet_info(files: str | list[str]) -> dict:
 def merge_parquets(files: list[str], output: str):
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
     with ParquetWriter(output, dataset.schema, compression="zstd", compression_level=3) as writer:
-        # there can be more batches if merge files containing over 2**20 rows
+        # there can be more batches when merging files containing over 2**20 rows
         bar = track(dataset.to_batches(), total=len(dataset.files), description=Path(output).stem)
         for batch in bar:
             writer.write_batch(batch)
