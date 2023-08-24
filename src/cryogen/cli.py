@@ -1,15 +1,12 @@
 from enum import Enum
 from pathlib import Path
-from time import time
-from typing import Annotated, Optional
+from typing import Annotated
 
 import cryo
 from rich.console import Console
-from rich.panel import Panel
 from rich.progress import Progress
 from rich.theme import Theme
-from tqdm import tqdm
-from typer import Argument, Option, Typer, prompt
+from typer import Option, Typer
 
 from cryogen.consolidate import combine_ranges, find_gaps
 from cryogen.constants import DEFAULT_RANGE, FAR_AWAY_BLOCK

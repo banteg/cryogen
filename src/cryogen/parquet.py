@@ -1,13 +1,8 @@
 from collections import Counter
-from pathlib import Path
 from time import time
 
-import polars as pl
 from pyarrow.dataset import dataset as arrow_dataset
 from pyarrow.parquet import FileMetaData, ParquetDataset, ParquetFile, ParquetWriter
-from tqdm import tqdm
-
-from cryogen.utils import extract_range
 
 
 def parquet_info(files: str | list[str]) -> dict:

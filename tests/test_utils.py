@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 from cryogen import utils
-from cryogen.constants import BLOCK_CHUNK, FAR_AWAY_BLOCK
+from cryogen.constants import FAR_AWAY_BLOCK
 
 name = Path("ethereum__contracts__12325000_to_12325999.parquet")
 
