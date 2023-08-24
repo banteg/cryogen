@@ -1,3 +1,4 @@
+import time
 from enum import Enum
 from pathlib import Path
 from typing import Annotated
@@ -97,6 +98,19 @@ def consolidate(
 
     info_out = parquet_info(output_dir)
     console.log(info_out)
+
+
+@app.command()
+def watch(
+    dataset: Dataset,
+    data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
+    blocks: Annotated[range, Option(parser=parse_blocks)] = DEFAULT_RANGE,
+    interval: Annotated[int, Option(min=60, max=86400)] = 3600,
+):
+    while True:
+        collect(dataset, data_dir, blocks)
+        consolidate(dataset, data_dir, inplace=True)
+        time.sleep(interval)
 
 
 if __name__ == "__main__":

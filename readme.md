@@ -46,3 +46,14 @@ cryogen consolidate contraces --no-inplace
 ```
 
 note that after consolidating with cryogen, you should use cryogen to update the dataset. cryo won't recognize larger chunks and would attempt to collect the already merged and deleted smaller chunks, outputting duplicate data in the dataset.
+
+### `cryogen watch <dataset>`
+
+combines `collect` and `consolidate` command.
+
+keep it running and it will update the dataset periodically.
+
+```shell
+# refresh every 4 hours
+cryogen watch contracts --interval 14400
+```
