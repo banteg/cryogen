@@ -57,3 +57,12 @@ keep it running and it will update the dataset periodically.
 # refresh every 4 hours
 cryogen watch contracts --interval 14400
 ```
+
+### `cryogen info <dataset>`
+
+collects info about a parquet dataset.
+
+```shell
+cryogen info contracts
+# {'num_rows': 62466632, 'files': 38, 'row_groups': 17984, 'total_compressed_size': 7850356027, 'total_uncompressed_size': 29236070746, 'elapsed': 0.747}
+```
