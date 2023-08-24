@@ -5,7 +5,9 @@ from time import time
 import polars as pl
 from pyarrow.dataset import dataset as arrow_dataset
 from pyarrow.parquet import FileMetaData, ParquetDataset, ParquetFile, ParquetWriter
-from rich.progress import track
+from tqdm import tqdm
+
+from cryogen.utils import extract_range
 
 
 def parquet_info(files: str | list[str]) -> dict:
@@ -29,9 +31,11 @@ def parquet_info(files: str | list[str]) -> dict:
 
 
 def merge_parquets(files: list[str], output: str):
+    assert len(files) > 1, "trying to merge a single file"
+
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
+
     with ParquetWriter(output, dataset.schema, compression="zstd", compression_level=3) as writer:
         # there can be more batches when merging files containing over 2**20 rows
-        bar = track(dataset.to_batches(), total=len(dataset.files), description=Path(output).stem)
-        for batch in bar:
+        for batch in dataset.to_batches():
             writer.write_batch(batch)

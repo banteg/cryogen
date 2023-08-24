@@ -3,7 +3,11 @@ from pathlib import Path
 from time import time
 from typing import Annotated, Optional
 
-from rich import print
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import Progress
+from rich.theme import Theme
+from tqdm import tqdm
 from typer import Argument, Option, Typer, prompt
 
 from cryogen.consolidate import combine_ranges, find_gaps
@@ -12,6 +16,7 @@ from cryogen.parquet import merge_parquets, parquet_info
 from cryogen.utils import extract_range, parse_blocks, replace_range
 
 app = Typer()
+console = Console(theme=Theme({"repr.number": "bold green"}))
 
 
 class Dataset(Enum):
@@ -51,32 +56,35 @@ def collect(
 def consolidate(
     dataset: Dataset,
     data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
-    suffix: str = "out",
+    inplace: bool = False,
 ):
-    print(dataset.value, data_dir)
     dataset_dir = data_dir / dataset.value
-    output_dir = data_dir / (dataset.value + f"_{suffix}")
+    suffix = "" if inplace else "_out"
+    output_dir = data_dir / (dataset.value + suffix)
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    print(dataset_dir)
-    info = parquet_info(dataset_dir)
-    print(info)
 
     sample_name = next(dataset_dir.glob("*.parquet"))
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
-    combined = combine_ranges(ranges)
-    start = time()
+    combined = combine_ranges(ranges, leftover=False)
+    progress = Progress(console=console)
+    overall_task = progress.add_task("consolidate", total=len(ranges))
 
-    for r in combined:
-        # print(f"consolidating {r} from {len(combined[r])} files")
-        output_file = output_dir / replace_range(sample_name, r).name
-        input_files = [replace_range(sample_name, sub) for sub in combined[r]]
-        # print(output_file)
-        merge_parquets(input_files, output_file)
+    with progress:
+        for r in combined:
+            input_files = [replace_range(sample_name, sub) for sub in combined[r]]
+            output_file = output_dir / replace_range(sample_name, r).name
+
+            merge_parquets(input_files, output_file)
+
+            # delete input files
+            if inplace:
+                for f in input_files:
+                    f.unlink()
+
+            progress.update(overall_task, advance=len(combined[r]))
 
     info_out = parquet_info(output_dir)
-    print(info_out)
-    print(f"elapsed {time() - start:.3f}")
+    console.log(info_out)
 
 
 if __name__ == "__main__":

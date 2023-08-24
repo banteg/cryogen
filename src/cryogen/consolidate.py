@@ -1,17 +1,13 @@
-from cryogen.constants import PARTITION_SIZES, FAR_AWAY_BLOCK
-from cryogen.utils import extract_range
-from pathlib import Path
+from cryogen.constants import FAR_AWAY_BLOCK, PARTITION_SIZES
 
 
 def sort_ranges(ranges):
     return sorted(ranges, key=lambda r: r.start)
 
 
-def combine_ranges(
-    ranges: list[range],
-) -> dict[range, list[range]]:
+def combine_ranges(ranges: list[range], leftover=False) -> dict[range, list[range]]:
     """
-    combine ranges into bigger ranges. only merge
+    combine ranges into bigger ranges. only merge complete ranges.
 
     returns {big_range: [ranges, to, be, merged]}
     """
@@ -42,9 +38,10 @@ def combine_ranges(
                 consumed_ranges.update(chunks)
 
     # add leftover ranges
-    for r in ranges:
-        if r not in consumed_ranges:
-            combined_ranges[r] = [r]
+    if leftover:
+        for r in ranges:
+            if r not in consumed_ranges:
+                combined_ranges[r] = [r]
 
     return combined_ranges
 
