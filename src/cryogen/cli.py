@@ -4,9 +4,6 @@ from pathlib import Path
 from typing import Annotated
 
 import cryo
-from rich.console import Console
-from rich.progress import Progress
-from rich.theme import Theme
 from typer import Option, Typer
 
 from cryogen.consolidate import combine_ranges, find_gaps
@@ -15,7 +12,6 @@ from cryogen.parquet import merge_parquets, parquet_info
 from cryogen.utils import extract_range, parse_blocks, replace_range
 
 app = Typer()
-console = Console(theme=Theme({"repr.number": "bold green"}))
 
 
 class Dataset(Enum):
@@ -40,12 +36,9 @@ def collect(
 ):
     dataset_dir = data_dir / dataset.value
 
-    console.log(blocks)
-
     # split works into gaps
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
     gaps = find_gaps(ranges)
-    console.log("gaps", gaps)
 
     for gap in gaps:
         adjusted = range(
@@ -79,28 +72,21 @@ def consolidate(
     sample_name = next(dataset_dir.glob("*.parquet"))
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
     combined = combine_ranges(ranges, leftover=False)
-    progress = Progress(console=console)
-    overall_task = progress.add_task("consolidate", total=len(ranges))
 
-    with progress:
-        for r in combined:
-            if len(combined[r]) == 1:
-                continue
+    for r in combined:
+        if len(combined[r]) == 1:
+            continue
 
-            input_files = [replace_range(sample_name, sub) for sub in combined[r]]
-            output_file = output_dir / replace_range(sample_name, r).name
+        input_files = [replace_range(sample_name, sub) for sub in combined[r]]
+        output_file = output_dir / replace_range(sample_name, r).name
 
-            merge_parquets(input_files, output_file)
+        print(f"combining {output_file.name} from {len(input_files)} files")
+        merge_parquets(input_files, output_file)
 
-            # delete input files
-            if inplace:
-                for f in input_files:
-                    f.unlink()
-
-            progress.update(overall_task, advance=len(combined[r]))
-
-    info_out = parquet_info(output_dir)
-    console.log(info_out)
+        # delete input files
+        if inplace:
+            for f in input_files:
+                f.unlink()
 
 
 @app.command()
