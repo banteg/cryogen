@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import pytest
 from cryogen import utils
-from cryogen.constants import FAR_AWAY_BLOCK, BLOCK_CHUNK
+from cryogen.constants import BLOCK_CHUNK, FAR_AWAY_BLOCK
 
-name = "ethereum__contracts__12325000_to_12325999.parquet"
+name = Path("ethereum__contracts__12325000_to_12325999.parquet")
 
 
 def test_extract_range():
@@ -10,7 +12,7 @@ def test_extract_range():
 
 
 def test_replace_range():
-    new_name = "ethereum__contracts__00001000_to_00002000.parquet"
+    new_name = Path("ethereum__contracts__00001000_to_00001999.parquet")
     assert utils.replace_range(name, range(1000, 2000)) == new_name
 
 
