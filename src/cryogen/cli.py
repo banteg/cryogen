@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Annotated
 
 import cryo
+import rich
 from typer import Option, Typer
 
 from cryogen.consolidate import combine_ranges, find_gaps
@@ -101,6 +102,11 @@ def watch(
         collect(dataset, data_dir, blocks)
         consolidate(dataset, data_dir, inplace=True)
         time.sleep(interval)
+
+
+@app.command()
+def info(folder: Path):
+    rich.print(parquet_info(folder))
 
 
 if __name__ == "__main__":
