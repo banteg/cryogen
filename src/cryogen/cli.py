@@ -73,7 +73,7 @@ def collect(
 def consolidate(
     dataset: Dataset,
     data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
-    inplace: bool = False,
+    inplace: bool = True,
 ):
     dataset_dir = data_dir / dataset.value
     suffix = "" if inplace else "_out"
