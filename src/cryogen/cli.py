@@ -84,6 +84,9 @@ def consolidate(
 
     with progress:
         for r in combined:
+            if len(combined[r]) == 1:
+                continue
+
             input_files = [replace_range(sample_name, sub) for sub in combined[r]]
             output_file = output_dir / replace_range(sample_name, r).name
 
