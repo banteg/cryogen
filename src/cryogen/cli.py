@@ -83,10 +83,12 @@ def consolidate(
         print(f"combining {output_file.name} from {len(input_files)} files")
         merge_parquets(input_files, output_file)
 
-        # delete input files
+        print("cleaning up")
         if inplace:
             for f in input_files:
                 f.unlink()
+
+        print("done")
 
 
 @app.command()
