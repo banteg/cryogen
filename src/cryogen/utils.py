@@ -5,16 +5,18 @@ from cryogen.constants import BLOCK_CHUNK, FAR_AWAY_BLOCK
 
 
 def extract_range(file: str) -> range:
+    # cryo uses [start, stop], convert to python [start, stop)
     start_block, stop_block = re.findall(r"\d+", Path(file).stem)
     return range(int(start_block), int(stop_block) + 1)
 
 
-def replace_range(file: str, r: range) -> str:
-    name = re.sub(r"\d+_to_\d+", f"{r.start:08d}_to_{r.stop:08d}", Path(file).stem)
-    return str(Path(file).with_stem(name))
+def replace_range(file: Path, r: range) -> Path:
+    # convert back from [start, stop) to [start, stop]
+    name = re.sub(r"\d+_to_\d+", f"{r.start:08d}_to_{r.stop - 1:08d}", file.stem)
+    return file.with_stem(name)
 
 
-def parse_blocks(blocks):
+def parse_blocks(blocks) -> range:
     if blocks in [None, ":"]:
         return range(0, FAR_AWAY_BLOCK)
 
