@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from cryogen.constants import BLOCK_CHUNK, FAR_AWAY_BLOCK
+from cryogen.constants import BLOCK_CHUNK, DEFAULT_RANGE, FAR_AWAY_BLOCK
 
 
 def extract_range(file: str) -> range:
@@ -17,8 +17,8 @@ def replace_range(file: Path, r: range) -> Path:
 
 
 def parse_blocks(blocks) -> range:
-    if blocks in [None, ":"]:
-        return range(0, FAR_AWAY_BLOCK)
+    if blocks in [None, ":", DEFAULT_RANGE]:
+        return DEFAULT_RANGE
 
     blocks_pattern = r"^(\d+)?:(\d+)?$"
     match = re.search(blocks_pattern, blocks)

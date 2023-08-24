@@ -1,4 +1,4 @@
-from cryogen.constants import FAR_AWAY_BLOCK, PARTITION_SIZES
+from cryogen.constants import DEFAULT_RANGE, FAR_AWAY_BLOCK, PARTITION_SIZES
 
 
 def sort_ranges(ranges):
@@ -54,7 +54,7 @@ def find_gaps(ranges: list[range]) -> list[range]:
     gaps = []
 
     if len(ranges) == 0:
-        return [range(0, FAR_AWAY_BLOCK)]
+        return [DEFAULT_RANGE]
 
     if ranges[0].start > 0:
         gaps.append(range(0, ranges[0].start))

@@ -3,6 +3,7 @@ from pathlib import Path
 from time import time
 from typing import Annotated, Optional
 
+import cryo
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress
@@ -11,7 +12,7 @@ from tqdm import tqdm
 from typer import Argument, Option, Typer, prompt
 
 from cryogen.consolidate import combine_ranges, find_gaps
-from cryogen.constants import FAR_AWAY_BLOCK
+from cryogen.constants import DEFAULT_RANGE, FAR_AWAY_BLOCK
 from cryogen.parquet import merge_parquets, parquet_info
 from cryogen.utils import extract_range, parse_blocks, replace_range
 
@@ -38,18 +39,34 @@ def collect(
     dataset: Dataset,
     data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
     rpc_url: Annotated[str, Option(envvar="ETH_RPC_URL")],
-    blocks: Annotated[Optional[range], Option(parser=parse_blocks)] = None,
+    blocks: Annotated[range, Option(parser=parse_blocks)] = DEFAULT_RANGE,
 ):
     print(dataset.value, data_dir, rpc_url)
     dataset_dir = data_dir / dataset.value
 
-    # blocks = parse_blocks(blocks)
-    print(blocks)
+    console.log(blocks)
 
     # split works into gaps
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
     gaps = find_gaps(ranges)
-    print(gaps)
+    console.log("gaps", gaps)
+
+    for gap in gaps:
+        adjusted = range(
+            max(gap.start, blocks.start),
+            min(gap.stop, blocks.stop),
+        )
+        block_range = f"{adjusted.start}:"
+        if adjusted.stop != FAR_AWAY_BLOCK:
+            block_range += f"{adjusted.stop}"
+
+        cryo.freeze(
+            dataset.value,
+            blocks=[block_range],
+            align=True,
+            output_dir=str(dataset_dir),
+            compression=["zstd", "3"],
+        )
 
 
 @app.command()
