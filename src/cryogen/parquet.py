@@ -5,6 +5,12 @@ from rich.progress import track
 
 from pyarrow.dataset import dataset as arrow_dataset
 from pyarrow.parquet import FileMetaData, ParquetDataset, ParquetFile, ParquetWriter
+from enum import Enum
+
+
+class MergeMethod(Enum):
+    batches = "batches"
+    tables = "tables"
 
 
 def parquet_info(files: str | list[str]) -> dict:
@@ -27,7 +33,7 @@ def parquet_info(files: str | list[str]) -> dict:
     return dict(info)
 
 
-def merge_parquets(files: list[str], output: str):
+def merge_parquets(files: list[str], output: str, method: MergeMethod):
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
     with ParquetWriter(
         output,
@@ -35,10 +41,19 @@ def merge_parquets(files: list[str], output: str):
         compression="zstd",
         compression_level=3,
     ) as writer:
-        # there can be more batches if merge files containing over 2**20 rows
-        for batch in track(
-            dataset.to_batches(),
-            total=len(dataset.files),
-            description=Path(output).stem,  # noqa: F821
-        ):
-            writer.write_batch(batch)
+        match method:
+            case MergeMethod.batches:
+                # there can be more batches if merge files containing over 2**20 rows
+                for batch in track(
+                    dataset.to_batches(),
+                    total=len(dataset.files),
+                    description=Path(output).stem,  # noqa: F821
+                ):
+                    writer.write_batch(batch)
+            case MergeMethod.tables:
+                start = time()
+                print(Path(output).stem, end="", flush=True)
+                writer.write_table(dataset.to_table())
+                print(f"... took {time() - start:.3f}")
+            case _:
+                raise NotImplementedError("unsupported merge method")
