@@ -51,7 +51,7 @@ def combine_ranges(
 
 def find_gaps(ranges: list[range]) -> list[range]:
     """
-    find uncovered gaps from in list of ranges.
+    find uncovered gaps in a list of ranges.
     """
     ranges = sort_ranges(ranges)
     gaps = []

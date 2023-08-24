@@ -1,9 +1,14 @@
-from pyarrow.dataset import dataset as arrow_dataset
-from pyarrow.parquet import ParquetDataset, ParquetFile, FileMetaData
 from collections import Counter
+from pathlib import Path
+from time import time
+from rich.progress import track
+
+from pyarrow.dataset import dataset as arrow_dataset
+from pyarrow.parquet import FileMetaData, ParquetDataset, ParquetFile, ParquetWriter
 
 
 def parquet_info(files: str | list[str]) -> dict:
+    start = time()
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
     info = Counter()
     info["num_rows"] = dataset.count_rows()
@@ -18,4 +23,22 @@ def parquet_info(files: str | list[str]) -> dict:
                 for col in range(meta.num_columns)
             )
 
-    return info
+    info["elapsed"] = round(time() - start, 3)
+    return dict(info)
+
+
+def merge_parquets(files: list[str], output: str):
+    dataset: ParquetDataset = arrow_dataset(files, format="parquet")
+    with ParquetWriter(
+        output,
+        dataset.schema,
+        compression="zstd",
+        compression_level=3,
+    ) as writer:
+        # there can be more batches if merge files containing over 2**20 rows
+        for batch in track(
+            dataset.to_batches(),
+            total=len(dataset.files),
+            description=Path(output).stem,  # noqa: F821
+        ):
+            writer.write_batch(batch)
