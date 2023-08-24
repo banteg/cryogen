@@ -5,6 +5,7 @@ license = "MIT"
 name = "cryogen"
 packages = [{include = 'cryogen', from = 'src'}]
 readme = "readme.md"
+repository = "https://github.com/banteg/cryogen"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
