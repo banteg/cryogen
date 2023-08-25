@@ -95,18 +95,11 @@ def bench(glob_path: str):
 
     import polars as pl
 
-    results = []
-
-    for path in glob(glob_path):
-        print(f"benching {path}")
-        start = time.time()
-        # bench query
-        df = pl.scan_parquet(Path(path) / "*.parquet")
-
-        out = (
-            df.unique("code_hash")
-            # .filter(pl.col("code").bin.starts_with(bytes.fromhex("363d3d373d3d3d363d73")))
-            .filter(pl.col("code").bin.encode("hex").str.contains(r"^363d3d373d3d3d363d73"))
+    def run_bench(path):
+        df = (
+            pl.scan_parquet(Path(path) / "*.parquet")
+            .filter(pl.col("code").bin.starts_with(bytes.fromhex("363d3d373d3d3d363d73")))
+            # .filter(pl.col("code").bin.encode("hex").str.contains(r"^363d3d373d3d3d363d73"))
             .with_columns(
                 pl.col("code")
                 .bin.encode("hex")
@@ -115,15 +108,21 @@ def bench(glob_path: str):
             )
             .groupby("impl")
             .agg(pl.count())
-            .sort("count")
+            .sort("count", descending=True)
             .select(pl.count())
             .collect()
         )
 
+    results = []
+
+    for path in glob(glob_path):
+        print(f"benching {path}")
+        start = time.time()
+        run_bench(path)
         elapsed = time.time() - start
         results.append({"path": path, "elapsed": elapsed})
 
-    res = pl.DataFrame(results).sort("elapsed", descending=True)
+    res = pl.DataFrame(results).sort("elapsed")
     res.write_csv("bench.csv")
     print(res)
 
