@@ -55,7 +55,7 @@ def parquet_info(files: Path | list[Path]) -> dict:
     return dict(info)
 
 
-def merge_parquets(files: list[Path], output: Path):
+def merge_parquets(files: list[Path], output: Path, block_size_mb: int):
     inplace = files[0].parent == output.parent
     # copy a single chunk if we are not combining in-place
     if len(files) == 1:
@@ -79,7 +79,7 @@ def merge_parquets(files: list[Path], output: Path):
         for batch in dataset.to_batches():  # type: ignore
             pending_batch.add(batch)
             # write row group
-            if pending_batch.size > BATCH_SIZE:
+            if pending_batch.size > (block_size_mb * 2**20):
                 print(f"  writing {pending_batch}")
                 writer.write_table(pending_batch.to_table())
                 pending_batch.clear()

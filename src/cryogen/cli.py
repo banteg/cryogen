@@ -49,10 +49,11 @@ def collect(
 def consolidate(
     dataset: Dataset,
     data_dir: Annotated[Path, Option(envvar="CRYO_DATA_DIR")],
-    inplace: bool = True,
+    block_size: int = 128,
 ):
+    inplace = False  # bench only
     dataset_dir = data_dir / dataset.value
-    suffix = "" if inplace else "_out"
+    suffix = "" if inplace else f"_{block_size}"
     output_dir = data_dir / (dataset.value + suffix)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -65,7 +66,7 @@ def consolidate(
         output_file = output_dir / replace_range(sample_name, r).name
 
         print(f"[yellow]combining [bold]{output_file.name}[/] from {len(input_files)} files")
-        merge_parquets(input_files, output_file)
+        merge_parquets(input_files, output_file, block_size)
 
     print("[bold green]done")
 
