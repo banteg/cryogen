@@ -38,7 +38,7 @@ consolidate a dataset in-place.
 
 this command will merge parquets into larger files covering 1e4, 1e5, 1e6 blocks. smaller files are not touched until a larger contiguous block can be formed. the worst case for this algorithm is 17 + 9 + 9 + 9 = 44 files at block 17,999,000.
 
-starting from v0.2.0 cryogen also reduces the number of row groups by approximately 100x. it creates a row group when an uncompressed size of a batch reaches 512 mb. this row group size provides optimal performance without imposing higher memory requirements that could lead to heavy swapping.
+starting from v0.2.0 cryogen also reduces the number of row groups. it creates a row group when an uncompressed size of a batch reaches 32 mb. this row group size provides optimal performance without imposing higher memory requirements that could lead to heavy swapping.
 
 ```shell
 cryogen consolidate contracts
