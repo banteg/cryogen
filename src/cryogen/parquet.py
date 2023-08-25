@@ -76,7 +76,7 @@ def merge_parquets(files: list[Path], output: Path):
                 pending_batch.clear()
                 row_groups += 1
 
-        if pending_batch:
+        if pending_batch.batches:
             print(f"  writing {pending_batch}")
             writer.write_table(pending_batch.to_table())
             row_groups += 1
