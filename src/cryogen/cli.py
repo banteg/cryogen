@@ -90,7 +90,7 @@ def info(folder: Path):
 
 
 @app.command()
-def bench(glob_path: str):
+def bench(glob_path: str, repeat: int = 1):
     from glob import glob
 
     import polars as pl
@@ -118,8 +118,9 @@ def bench(glob_path: str):
     for path in glob(glob_path):
         print(f"benching {path}")
         start = time.time()
-        run_bench(path)
-        elapsed = time.time() - start
+        for i in range(repeat):
+            run_bench(path)
+        elapsed = (time.time() - start) / repeat
         info = parquet_info(path)
         results.append({"path": path, "elapsed": elapsed, "row_groups": info["row_groups"]})
 
