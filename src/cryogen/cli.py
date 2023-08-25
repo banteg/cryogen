@@ -21,6 +21,7 @@ def collect(
     blocks: Annotated[range, Option(parser=parse_blocks)] = DEFAULT_RANGE,
 ):
     dataset_dir = data_dir / dataset.value
+    dataset_dir.mkdir(parents=True, exist_ok=True)
 
     # split works into gaps
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
