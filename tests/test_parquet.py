@@ -32,10 +32,10 @@ def test_parquet_merge():
         for table, name in zip(tables, names):
             write_table(table, name)
 
+        info_split = parquet.parquet_info(names)
+
         out_name = Path(dir) / "out.parquet"
         parquet.merge_parquets(names, out_name)
-
-        info_split = parquet.parquet_info(names)
         info_merged = parquet.parquet_info(out_name)
 
     assert info_split["num_rows"] == info_merged["num_rows"]
