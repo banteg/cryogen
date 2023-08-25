@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated
 
 import cryo
-import rich
+from rich import print
 from typer import Option, Typer
 
 from cryogen.consolidate import combine_ranges, find_gaps
@@ -40,7 +40,7 @@ def collect(
             blocks=[block_range],
             align=True,
             output_dir=str(dataset_dir),
-            compression=["zstd", "3"],
+            compression=["zstd", "3"],  # type: ignore
         )
 
 
@@ -63,14 +63,14 @@ def consolidate(
         input_files = [replace_range(sample_name, sub) for sub in combined[r]]
         output_file = output_dir / replace_range(sample_name, r).name
 
-        print(f"combining {output_file.name} from {len(input_files)} files")
+        print(f"[yellow]combining [bold]{output_file.name}[/] from {len(input_files)} files")
         merge_parquets(input_files, output_file)
 
         if inplace:
             for f in input_files:
                 f.unlink()
 
-    print("done")
+    print("[bold green]done")
 
 
 @app.command()
@@ -88,7 +88,7 @@ def watch(
 
 @app.command()
 def info(folder: Path):
-    rich.print(parquet_info(folder))
+    print(parquet_info(folder))
 
 
 if __name__ == "__main__":

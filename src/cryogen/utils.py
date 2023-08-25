@@ -4,9 +4,9 @@ from pathlib import Path
 from cryogen.constants import BLOCK_CHUNK, DEFAULT_RANGE, FAR_AWAY_BLOCK
 
 
-def extract_range(file: str) -> range:
+def extract_range(file: Path) -> range:
     # cryo uses [start, stop], convert to python [start, stop)
-    start_block, stop_block = re.findall(r"\d+", Path(file).stem)
+    start_block, stop_block = re.findall(r"\d+", file.stem)
     return range(int(start_block), int(stop_block) + 1)
 
 
