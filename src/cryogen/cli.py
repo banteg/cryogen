@@ -120,7 +120,8 @@ def bench(glob_path: str):
         start = time.time()
         run_bench(path)
         elapsed = time.time() - start
-        results.append({"path": path, "elapsed": elapsed})
+        info = parquet_info(path)
+        results.append({"path": path, "elapsed": elapsed, "row_groups": info["row_groups"]})
 
     res = pl.DataFrame(results).sort("elapsed")
     res.write_csv("bench.csv")
