@@ -1,3 +1,4 @@
+import shutil
 from collections import Counter
 from time import time
 
@@ -26,7 +27,9 @@ def parquet_info(files: str | list[str]) -> dict:
 
 
 def merge_parquets(files: list[str], output: str):
-    assert len(files) > 1, "trying to merge a single file"
+    if len(files) == 1 and str(files[0]) != str(output):
+        shutil.copyfile(files[0], output)
+        return
 
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
     size = parquet_info(files)["total_compressed_size"]
