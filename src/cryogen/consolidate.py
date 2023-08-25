@@ -5,7 +5,7 @@ def sort_ranges(ranges):
     return sorted(ranges, key=lambda r: r.start)
 
 
-def combine_ranges(ranges: list[range], leftover=False) -> dict[range, list[range]]:
+def combine_ranges(ranges: list[range]) -> dict[range, list[range]]:
     """
     combine ranges into bigger ranges. only merge complete ranges.
 
@@ -38,10 +38,9 @@ def combine_ranges(ranges: list[range], leftover=False) -> dict[range, list[rang
                 consumed_ranges.update(chunks)
 
     # add leftover ranges
-    if leftover:
-        for r in ranges:
-            if r not in consumed_ranges:
-                combined_ranges[r] = [r]
+    for r in ranges:
+        if r not in consumed_ranges:
+            combined_ranges[r] = [r]
 
     return combined_ranges
 

@@ -57,7 +57,7 @@ def consolidate(
 
     sample_name = next(dataset_dir.glob("*.parquet"))
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
-    combined = combine_ranges(ranges, leftover=False)
+    combined = combine_ranges(ranges)
 
     for r in combined:
         input_files = [replace_range(sample_name, sub) for sub in combined[r]]
