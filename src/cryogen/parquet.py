@@ -2,6 +2,7 @@ import shutil
 from collections import Counter
 from time import time
 
+from click import Path
 from pyarrow.dataset import dataset as arrow_dataset
 from pyarrow.parquet import FileMetaData, ParquetDataset, ParquetFile, ParquetWriter
 
@@ -26,8 +27,8 @@ def parquet_info(files: str | list[str]) -> dict:
     return dict(info)
 
 
-def merge_parquets(files: list[str], output: str):
-    if len(files) == 1 and str(files[0]) != str(output):
+def merge_parquets(files: list[Path], output: Path):
+    if len(files) == 1 and files[0] != output:
         shutil.copyfile(files[0], output)
         return
 
