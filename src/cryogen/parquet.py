@@ -58,12 +58,16 @@ def parquet_info(files: Path | list[Path]) -> dict:
 def merge_parquets(files: list[Path], output: Path):
     # copy a single chunk if we are not combining in-place
     if len(files) == 1 and files[0] != output:
+        print("  copying file")
         shutil.copyfile(files[0], output)
         return
 
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
+    temp_output = output.with_suffix(".tmp")
 
-    with ParquetWriter(output, dataset.schema, compression="zstd", compression_level=3) as writer:
+    with ParquetWriter(
+        temp_output, dataset.schema, compression="zstd", compression_level=3
+    ) as writer:
         pending_batch = PendingBatch()
         row_groups = 0
         # files containing over 2**20 rows can produce multiple batches
@@ -81,4 +85,5 @@ def merge_parquets(files: list[Path], output: Path):
             writer.write_table(pending_batch.to_table())
             row_groups += 1
 
+        temp_output.rename(output)
         print(f"[green]written as {row_groups} row groups")
