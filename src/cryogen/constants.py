@@ -4,7 +4,7 @@ PARTITION_SIZES = [1_000_000, 100_000, 10_000]
 FAR_AWAY_BLOCK = 1_000_000_000
 DEFAULT_RANGE = range(0, FAR_AWAY_BLOCK)
 BLOCK_CHUNK = 1000
-BATCH_SIZE = 2**29  # 512 mb uncompressed chunks
+BATCH_SIZE = 32 * 2**20  # 32 mb uncompressed chunks
 
 
 class Dataset(Enum):

@@ -51,7 +51,7 @@ def parquet_info(files: Path | list[Path]) -> dict:
                 for col in range(meta.num_columns)
             )
 
-    info["elapsed"] = round(time() - start, 3)
+    info["elapsed"] = time() - start
     return dict(info)
 
 
