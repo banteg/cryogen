@@ -29,8 +29,17 @@ def merge_parquets(files: list[str], output: str):
     assert len(files) > 1, "trying to merge a single file"
 
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
+    size = parquet_info(files)["total_compressed_size"]
 
     with ParquetWriter(output, dataset.schema, compression="zstd", compression_level=3) as writer:
-        # there can be more batches when merging files containing over 2**20 rows
-        for batch in dataset.to_batches():
-            writer.write_batch(batch)
+        if size > 2**28:  # 256mb
+            # there can be more batches when merging files containing over 2**20 rows
+            n = 0
+            for batch in dataset.to_batches():
+                writer.write_batch(batch)
+                n += 1
+            print(f"written as {n} row groups")
+        else:
+            # write as a singe row group
+            writer.write_table(dataset.to_table())
+            print("written as a single row group")
