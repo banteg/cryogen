@@ -66,10 +66,6 @@ def consolidate(
         print(f"[yellow]combining [bold]{output_file.name}[/] from {len(input_files)} files")
         merge_parquets(input_files, output_file)
 
-        if inplace:
-            for f in input_files:
-                f.unlink()
-
     print("[bold green]done")
 
 

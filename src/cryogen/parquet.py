@@ -56,10 +56,15 @@ def parquet_info(files: Path | list[Path]) -> dict:
 
 
 def merge_parquets(files: list[Path], output: Path):
+    inplace = files[0].parent == output.parent
     # copy a single chunk if we are not combining in-place
-    if len(files) == 1 and files[0] != output:
-        print("  copying file")
-        shutil.copyfile(files[0], output)
+    if len(files) == 1:
+        if inplace:
+            print("  skip file with a single chunk")
+        else:
+            print("  copying file")
+            shutil.copyfile(files[0], output)
+
         return
 
     dataset: ParquetDataset = arrow_dataset(files, format="parquet")
@@ -87,3 +92,8 @@ def merge_parquets(files: list[Path], output: Path):
 
         temp_output.rename(output)
         print(f"[green]written as {row_groups} row groups")
+
+        if inplace:
+            print(f"[red]deleting {len(files)} files")
+            for file in files:
+                file.unlink()
