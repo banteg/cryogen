@@ -89,5 +89,44 @@ def info(folder: Path):
     print(parquet_info(folder))
 
 
+@app.command()
+def bench(glob_path: str):
+    from glob import glob
+
+    import polars as pl
+
+    results = []
+
+    for path in glob(glob_path):
+        print(f"benching {path}")
+        start = time.time()
+        # bench query
+        df = pl.scan_parquet(Path(path) / "*.parquet")
+
+        out = (
+            df.unique("code_hash")
+            # .filter(pl.col("code").bin.starts_with(bytes.fromhex("363d3d373d3d3d363d73")))
+            .filter(pl.col("code").bin.encode("hex").str.contains(r"^363d3d373d3d3d363d73"))
+            .with_columns(
+                pl.col("code")
+                .bin.encode("hex")
+                .str.extract(r"^363d3d373d3d3d363d73(.{40})5af43d82803e903d91602b57fd5bf3", 1)
+                .alias("impl")
+            )
+            .groupby("impl")
+            .agg(pl.count())
+            .sort("count")
+            .select(pl.count())
+            .collect()
+        )
+
+        elapsed = time.time() - start
+        results.append({"path": path, "elapsed": elapsed})
+
+    res = pl.DataFrame(results).sort("elapsed", descending=True)
+    res.write_csv("bench.csv")
+    print(res)
+
+
 if __name__ == "__main__":
     app()
