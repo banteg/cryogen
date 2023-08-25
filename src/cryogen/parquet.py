@@ -32,7 +32,7 @@ class PendingBatch:
         return Table.from_batches(self.batches)
 
     def __str__(self):
-        return f"<PendingBatch chunks={len(self.batches)} size={self.size / 2**20:,.2f}mb rows={self.rows:,d}>"
+        return f"<PendingBatch chunks={len(self.batches)} size={self.size / 2**20:,.2f}mb rows={self.rows:,d}>"  # noqa: E501
 
 
 def parquet_info(files: Path | list[Path]) -> dict:
