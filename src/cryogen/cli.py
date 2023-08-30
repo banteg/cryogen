@@ -22,6 +22,9 @@ def collect(
 ):
     dataset_dir = data_dir / dataset.value
     dataset_dir.mkdir(parents=True, exist_ok=True)
+    dataset_params = {}
+    if dataset == Dataset.transactions:
+        dataset_params |= {'include_columns': ['gas_used']}
 
     # split works into gaps
     ranges = [extract_range(file) for file in dataset_dir.glob("*.parquet")]
@@ -42,6 +45,7 @@ def collect(
             align=True,
             output_dir=str(dataset_dir),
             compression=["zstd", "3"],  # type: ignore
+            **dataset_params,
         )
 
 
