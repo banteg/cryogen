@@ -6,7 +6,7 @@ from cryogen.constants import BLOCK_CHUNK, DEFAULT_RANGE, FAR_AWAY_BLOCK
 
 def extract_range(file: Path) -> range:
     # cryo uses [start, stop], convert to python [start, stop)
-    start_block, stop_block = re.findall(r"\d+", file.stem)
+    start_block, stop_block = re.findall(r"\d+", file.stem)[-2:]
     return range(int(start_block), int(stop_block) + 1)
 
 
