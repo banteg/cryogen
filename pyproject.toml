@@ -6,7 +6,7 @@ name = "cryogen"
 packages = [{include = 'cryogen', from = 'src'}]
 readme = "readme.md"
 repository = "https://github.com/banteg/cryogen"
-version = "0.2.4"
+version = "0.2.5"
 
 [tool.poetry.dependencies]
 pyarrow = ">=13.0.0"
